@@ -164,24 +164,28 @@ dd $f // $t;             # Logic::Ternary::False
 =head1 DESCRIPTION
 
 Logic::Ternary implements a three-valued logic for Raku:
-C<True> (+1), C<Unknown> (0) and C<False> (-1). The values are
+=item C<True> (+1),
+=item C<Unknown> (0)
+=item and C<False> (-1).
+
+The values are
 C<Logic::Ternary::True>, C<Logic::Ternary::Unknown> and
 C<Logic::Ternary::False>.
 
-- Predicates: C<.is-true>, C<.is-false>, C<.is-unknown>.
-- Negation: C<NOT $x> or C<$x.not>.
-- Booleanization: C<Bool($x)> is true only when C<$x> is C<True>.
-- Coercion: C<Numeric.Ternary> maps negatives→C<False>, zero→C<Unknown>, positives→C<True>; C<Bool.Ternary> preserves C<True/False> and yields C<Unknown> when undefined.
+=item Predicates: C<.is-true>, C<.is-false>, C<.is-unknown>.
+=item Negation: C<NOT $x> or C<$x.not>.
+=item Booleanization: C<Bool($x)> is true only when C<$x> is C<True>.
+=item Coercion: C<Numeric.Ternary> maps negatives→C<False>, zero→C<Unknown>, positives→C<True>; C<Bool.Ternary> preserves C<True/False> and yields C<Unknown> when undefined.
 
 =head2 Operators
 
 Always use the UPPERCASE operators:
 
-- C<AND>: ternary conjunction with appropriate semantics.
-- C<OR>: ternary disjunction with appropriate semantics.
-- C<XOR>: defined as C<(A OR B) AND NOT(A AND B)>.
-- C<!> and C<NOT>: negation.
-- C<//>: ternary "defined-or": returns the right operand when the left is C<Unknown> or a type object (uninstantiated).
+=item C<AND>: ternary conjunction with appropriate semantics.
+=item C<OR>: ternary disjunction with appropriate semantics.
+=item C<XOR>: defined as C<(A OR B) AND NOT(A AND B)>.
+=item C<.not> and C<NOT>: negation.
+=item C<//>: ternary "defined-or": returns the right operand when the left is C<Unknown> or a type object (uninstantiated).
 
 =head2 Important: and/&&/or/||/xor/^^
 
@@ -190,8 +194,8 @@ are likely not to work correctly with C<Logic::Ternary>. The Raku parser
 gives those operators special short-circuit handling, which can bypass our
 multis and/or force early booleanization.
 
-- Prefer C<AND>, C<OR> and C<XOR>.
-- I plan to address this with RakuAST in future versions so the lowercase
+=item Prefer C<AND>, C<OR> and C<XOR>.
+=item I plan to address this with RakuAST in future versions so the lowercase
   counterparts can work transparently.
 
 =head2 Quick examples

@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/FCO/Logic-Ternary/actions/workflows/test.yml/badge.svg)](https://github.com/FCO/Logic-Ternary/actions)
+
 NAME
 ====
 
@@ -37,23 +39,47 @@ dd $f // $t;             # Logic::Ternary::False
 DESCRIPTION
 ===========
 
-Logic::Ternary implements a three-valued logic for Raku: `True` (+1), `Unknown` (0) and `False` (-1). The values are `Logic::Ternary::True`, `Logic::Ternary::Unknown` and `Logic::Ternary::False`.
+Logic::Ternary implements a three-valued logic for Raku:
 
-- Predicates: `.is-true`, `.is-false`, `.is-unknown`. - Negation: `NOT $x` or `$x.not`. - Booleanization: `Bool($x)` is true only when `$x` is `True`. - Coercion: `Numeric.Ternary` maps negatives→`False`, zero→`Unknown`, positives→`True`; `Bool.Ternary` preserves `True/False` and yields `Unknown` when undefined.
+  * `True` (+1),
+
+  * `Unknown` (0)
+
+  * and `False` (-1).
+
+The values are `Logic::Ternary::True`, `Logic::Ternary::Unknown` and `Logic::Ternary::False`.
+
+  * Predicates: `.is-true`, `.is-false`, `.is-unknown`.
+
+  * Negation: `NOT $x` or `$x.not`.
+
+  * Booleanization: `Bool($x)` is true only when `$x` is `True`.
+
+  * Coercion: `Numeric.Ternary` maps negatives→`False`, zero→`Unknown`, positives→`True`; `Bool.Ternary` preserves `True/False` and yields `Unknown` when undefined.
 
 Operators
 ---------
 
 Always use the UPPERCASE operators:
 
-- `AND`: ternary conjunction with appropriate semantics. - `OR`: ternary disjunction with appropriate semantics. - `XOR`: defined as `(A OR B) AND NOT(A AND B)`. - `!` and `NOT`: negation. - `//`: ternary "defined-or": returns the right operand when the left is `Unknown` or a type object (uninstantiated).
+  * `AND`: ternary conjunction with appropriate semantics.
+
+  * `OR`: ternary disjunction with appropriate semantics.
+
+  * `XOR`: defined as `(A OR B) AND NOT(A AND B)`.
+
+  * `.not` and `NOT`: negation.
+
+  * `//`: ternary "defined-or": returns the right operand when the left is `Unknown` or a type object (uninstantiated).
 
 Important: and/&&/or/||/xor/^^
 ------------------------------
 
 The lowercase operators `and`, `&&`, `or`, `||`, `xor` and `^^` are likely not to work correctly with `Logic::Ternary`. The Raku parser gives those operators special short-circuit handling, which can bypass our multis and/or force early booleanization.
 
-- Prefer `AND`, `OR` and `XOR`. - I plan to address this with RakuAST in future versions so the lowercase counterparts can work transparently.
+  * Prefer `AND`, `OR` and `XOR`.
+
+  * I plan to address this with RakuAST in future versions so the lowercase counterparts can work transparently.
 
 Quick examples
 --------------
