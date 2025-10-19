@@ -11,9 +11,9 @@ SYNOPSIS
 ```raku
 use Logic::Ternary;
 
-my $t = Logic::Ternary::True;
-my $f = Logic::Ternary::False;
-my $u = Logic::Ternary::Unknown;
+my $t = True;
+my $f = False;
+my $u = Unknown;
 
 # Negation
 dd $t.not;               # Logic::Ternary::False
@@ -80,27 +80,27 @@ Quick examples
 ```raku
 use Logic::Ternary;
 
-my $u = Logic::Ternary::Unknown;
+my $u = Unknown;
 
 # and3 behavior
-dd $u and3 Logic::Ternary::True;   # Logic::Ternary::Unknown
-dd $u and3 Logic::Ternary::False;  # Logic::Ternary::False
+dd $u and3 True;   # Logic::Ternary::Unknown
+dd $u and3 False;  # Logic::Ternary::False
 
 # or3 behavior
-dd Logic::Ternary::True or3 $u;    # Logic::Ternary::True
-dd $u or3 Logic::Ternary::False;   # Logic::Ternary::Unknown
+dd True or3 $u;    # Logic::Ternary::True
+dd $u or3 False;   # Logic::Ternary::Unknown
 
 # Mixed types are coerced
 dd 1 and3 0;       # Logic::Ternary::Unknown
 dd -2 or3  1;      # Logic::Ternary::True
 
-dd not3(1);        # Logic::Ternary::False
+dd not3 1;         # Logic::Ternary::False
 ```
 
 AUTHOR
 ======
 
-Fernando Corrêa de Oliveira <fernando.correa@payprop.com>
+Fernando Corrêa de Oliveira <fco@cpan.org>
 
 COPYRIGHT AND LICENSE
 =====================

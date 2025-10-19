@@ -2,7 +2,11 @@ use Test;
 use Logic::Ternary;
 
 my @vals = (False, Unknown, True);
-my %name = %(Logic::Ternary::False => 'F', Logic::Ternary::Unknown => 'U', Logic::Ternary::True => 'T');
+my %name = %(
+    Logic::Ternary::False   => 'F',
+    Logic::Ternary::Unknown => 'U',
+    Logic::Ternary::True    => 'T',
+);
 
 sub s($x) { %name{$x} // $x.raku }
 

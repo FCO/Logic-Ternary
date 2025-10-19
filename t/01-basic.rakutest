@@ -16,9 +16,9 @@ nok $F.Bool, 'Bool(False) is False';
 nok $U.Bool, 'Bool(Unknown) is False';
 
 # Coercions
-is-deeply  1 .Ternary,  $T, '1.Ternary -> True';
-is-deeply -3 .Ternary,  $F, '-3.Ternary -> False';
-is-deeply  0 .Ternary,  $U, '0.Ternary -> Unknown';
+is-deeply  1 .Ternary,  $T, '1 .Ternary -> True';
+is-deeply -3 .Ternary,  $F, '-3 .Ternary -> False';
+is-deeply  0 .Ternary,  $U, '0 .Ternary -> Unknown';
 is-deeply  Bool::True.Ternary,  $T, 'True.Ternary -> True';
 is-deeply  Bool::False.Ternary, $F, 'False.Ternary -> False';
 is-deeply  Bool.Ternary,  $U, 'Bool.Ternary (type object) -> Unknown';
