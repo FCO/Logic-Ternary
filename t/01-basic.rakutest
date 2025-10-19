@@ -6,9 +6,9 @@ my $F = False;
 my $U = Unknown;
 
 # Negation
-is-deeply $T.not, $F, 'NOT True -> False (method .not)';
-is-deeply NOT($U), $U, 'NOT Unknown -> Unknown (function)';
-is-deeply NOT($F), $T, 'NOT False -> True (function)';
+is-deeply $T.not, $F, 'not3 True -> False (method .not)';
+is-deeply not3 $U, $U, 'not3 Unknown -> Unknown (function)';
+is-deeply not3 $F, $T, 'not3 False -> True (function)';
 
 # Booleanization
 ok $T.Bool, 'Bool(True) is True';
@@ -23,35 +23,35 @@ is-deeply  Bool::True.Ternary,  $T, 'True.Ternary -> True';
 is-deeply  Bool::False.Ternary, $F, 'False.Ternary -> False';
 is-deeply  Bool.Ternary,  $U, 'Bool.Ternary (type object) -> Unknown';
 
-# AND (UPPERCASE)
-is-deeply $T AND $T, $T, 'T AND T -> T';
-is-deeply $T AND $U, $U, 'T AND U -> U';
-is-deeply $T AND $F, $F, 'T AND F -> F';
-is-deeply $U AND $T, $U, 'U AND T -> U';
-is-deeply $U AND $U, $U, 'U AND U -> U';
-is-deeply $U AND $F, $F, 'U AND F -> F';
-is-deeply $F AND $T, $F, 'F AND T -> F';
-is-deeply $F AND $U, $F, 'F AND U -> F';
-is-deeply $F AND $F, $F, 'F AND F -> F';
+# and3 (UPPERCASE)
+is-deeply $T and3 $T, $T, 'T and3 T -> T';
+is-deeply $T and3 $U, $U, 'T and3 U -> U';
+is-deeply $T and3 $F, $F, 'T and3 F -> F';
+is-deeply $U and3 $T, $U, 'U and3 T -> U';
+is-deeply $U and3 $U, $U, 'U and3 U -> U';
+is-deeply $U and3 $F, $F, 'U and3 F -> F';
+is-deeply $F and3 $T, $F, 'F and3 T -> F';
+is-deeply $F and3 $U, $F, 'F and3 U -> F';
+is-deeply $F and3 $F, $F, 'F and3 F -> F';
 
-# OR (UPPERCASE)
-is-deeply $T OR $T, $T, 'T OR T -> T';
-is-deeply $T OR $U, $T, 'T OR U -> T';
-is-deeply $T OR $F, $T, 'T OR F -> T';
-is-deeply $U OR $T, $T, 'U OR T -> U';
-is-deeply $U OR $U, $U, 'U OR U -> U';
-is-deeply $U OR $F, $U, 'U OR F -> U';
-is-deeply $F OR $T, $T, 'F OR T -> T';
-is-deeply $F OR $U, $U, 'F OR U -> U';
-is-deeply $F OR $F, $F, 'F OR F -> F';
+# or3 (UPPERCASE)
+is-deeply $T or3 $T, $T, 'T or3 T -> T';
+is-deeply $T or3 $U, $T, 'T or3 U -> T';
+is-deeply $T or3 $F, $T, 'T or3 F -> T';
+is-deeply $U or3 $T, $T, 'U or3 T -> U';
+is-deeply $U or3 $U, $U, 'U or3 U -> U';
+is-deeply $U or3 $F, $U, 'U or3 F -> U';
+is-deeply $F or3 $T, $T, 'F or3 T -> T';
+is-deeply $F or3 $U, $U, 'F or3 U -> U';
+is-deeply $F or3 $F, $F, 'F or3 F -> F';
 
-# XOR (UPPERCASE)
-is-deeply $T XOR $T, $F, 'T XOR T -> F';
-is-deeply $T XOR $F, $T, 'T XOR F -> T';
-is-deeply $F XOR $F, $F, 'F XOR F -> F';
-is-deeply $U XOR $F, $U, 'U XOR F -> U';
-is-deeply $U XOR $U, $U, 'U XOR U -> U';
-is-deeply $U XOR $T, $U, 'U XOR T -> U';
+# xor3 (UPPERCASE)
+is-deeply $T xor3 $T, $F, 'T xor3 T -> F';
+is-deeply $T xor3 $F, $T, 'T xor3 F -> T';
+is-deeply $F xor3 $F, $F, 'F xor3 F -> F';
+is-deeply $U xor3 $F, $U, 'U xor3 F -> U';
+is-deeply $U xor3 $U, $U, 'U xor3 U -> U';
+is-deeply $U xor3 $T, $U, 'U xor3 T -> U';
 
 # Ternary defined-or (//)
 is-deeply $U // $T, $T, 'Unknown // True -> True';

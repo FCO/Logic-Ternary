@@ -1,0 +1,45 @@
+use Test;
+use Logic::Ternary;
+
+my @vals = (False, Unknown, True);
+my %name = %(Logic::Ternary::False => 'F', Logic::Ternary::Unknown => 'U', Logic::Ternary::True => 'T');
+
+sub s($x) { %name{$x} // $x.raku }
+
+# Truth tables for and3/or3
+for @vals -> $a {
+    for @vals -> $b {
+        my $and = $a and3 $b;
+        my $or  = $a or3  $b;
+        isa-ok $and, Logic::Ternary, "and3 returns Ternary for {s $a} {s $b}";
+        isa-ok  $or, Logic::Ternary, "or3  returns Ternary for {s $a} {s $b}";
+    }
+}
+
+# xor3 definition consistency
+for @vals -> $a {
+    for @vals -> $b {
+        is-deeply ($a xor3 $b), (($a or3 $b) and3 not3 ($a and3 $b)), "xor3 law holds for {s $a} {s $b}";
+    }
+}
+
+# Coercion behavior for mixed types
+is-deeply (1 and3 0), Unknown, '1 and3 0 -> Unknown';
+is-deeply (-2 or3 1), True,    '-2 or3 1 -> True';
+is-deeply (0 or3 0),  Unknown, '0 or3 0 -> Unknown';
+
+# Negation
+is-deeply not3 1,  False, 'not3 1 -> False';
+is-deeply 1.Ternary.not, False, '1.Ternary.not -> False';
+
+# Lowercase boolean operators remain native and return original values
+is-deeply (1 && 0), 0, 'native && returns last falsy operand (0)';
+is-deeply (1 || 0), 1, 'native || returns first truthy operand (1)';
+isa-ok (1 && 0), Int, 'native && result is Int (not Ternary)';
+isa-ok (1 || 0), Int, 'native || result is Int (not Ternary)';
+
+# Smartmatch
+ok True ~~ True,   'smartmatch True ~~ True';
+ok !(True ~~ Unknown), 'smartmatch True !~~ Unknown';
+
+done-testing;

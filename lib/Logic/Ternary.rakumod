@@ -44,61 +44,20 @@ BEGIN {
 	Logic::Ternary.^add_method: "Bool", my method Bool { $.is-true }
 }
 
-multi so(Logic::Ternary $value) is export { $value.so }
-multi SO(Logic::Ternary $value) is export { $value.so }
+multi prefix:<so3>($value) is export { $value.Ternary.so }
 
-multi NOT(Logic::Ternary $value) is export { $value.not }
-multi not(Logic::Ternary $value) is export { $value.not }
-multi prefix:<!>(Logic::Ternary $value) is export { $value.not }
+multi prefix:<not3>($value) is export { $value.Ternary.not }
 
-multi infix:<AND>(Logic::Ternary $a, Logic::Ternary $b) is export { $a min $b }
-multi infix:<and>(Logic::Ternary $a, Logic::Ternary $b) is export { $a AND $b }
-multi infix:<&&>(Logic::Ternary $a,  Logic::Ternary $b) is export { $a AND $b }
+multi infix:<and3>($a, $b) is export { $a.Ternary min $b.Ternary }
 
-multi infix:<AND>(Logic::Ternary::Unknown $a,  $b where *.so ) is export { $a }
-multi infix:<AND>(Logic::Ternary::Unknown $a,  $b where *.not) is export { $b }
-multi infix:<AND>(Logic::Ternary::True  $a, $b) is export { $b }
-multi infix:<AND>(Logic::Ternary::False $a, $b) is export { $a }
+multi infix:<or3>($a, $b) is export { $a.Ternary max $b.Ternary }
 
-multi infix:<and>(Logic::Ternary $a, $b) is export { $a AND $b }
-multi infix:<&&>(Logic::Ternary  $a, $b) is export { $a AND $b }
+multi infix:<xor3>($a is copy, $b is copy) is export {
+	$a .= Ternary;
+	$b .= Ternary;
+	($a or3 $b) and3 not3 ($a and3 $b)
+}
 
-multi infix:<AND>($a where *.so , Logic::Ternary $b) is export { $b }
-multi infix:<AND>($a where *.not, Logic::Ternary $b) is export { $a }
-
-multi infix:<and>($a, Logic::Ternary $b) is export { $a AND $b }
-multi infix:<&&>( $a, Logic::Ternary $b) is export { $a AND $b }
-
-#########################
-
-multi infix:<OR>(Logic::Ternary $a, Logic::Ternary $b) is export { $a max $b }
-multi infix:<or>(Logic::Ternary $a, Logic::Ternary $b) is export { $a OR $b }
-multi infix:<||>(Logic::Ternary $a, Logic::Ternary $b) is export { $a OR $b }
-
-multi infix:<OR>(Logic::Ternary::Unknown $a, $b ) is export { $a }
-multi infix:<OR>(Logic::Ternary::True  $a, $b) is export { $a }
-multi infix:<OR>(Logic::Ternary::False $a, $b) is export { $b }
-
-multi infix:<or>(Logic::Ternary $a, $b) is export { $a AND $b }
-multi infix:<||>(Logic::Ternary $a, $b) is export { $a AND $b }
-
-multi infix:<OR>($a where *.so , Logic::Ternary $b) is export { $a }
-multi infix:<OR>($a where *.not, Logic::Ternary $b) is export { $b }
-
-multi infix:<or>($a, Logic::Ternary $b) is export { $a AND $b }
-multi infix:<||>( $a, Logic::Ternary $b) is export { $a AND $b }
-
-###############################
-
-multi infix:<XOR>(Logic::Ternary $a, Logic::Ternary $b) is export { ($a OR $b) AND NOT($a AND $b) }
-multi infix:<xor>(Logic::Ternary $a, Logic::Ternary $b) is export { $a XOR $b }
-multi infix:<^^>(Logic::Ternary $a,  Logic::Ternary $b) is export { $a XOR $b }
-
-###############################
-#
-multi infix:<//>(Logic::Ternary::Unknown $a, $b) is export { $b }
-multi infix:<//>(Logic::Ternary:U $a, $b) is export { $b }
-multi infix:<//>(Logic::Ternary $a, $b) is export { $a }
 
 use MONKEY-TYPING;
 augment class Any {
@@ -136,18 +95,18 @@ Logic::Ternary — Ternary logic for Raku
 =begin code :lang<raku>
 use Logic::Ternary;
 
-my $t = True;
-my $f = False;
-my $u = Unknown;
+my $t = Logic::Ternary::True;
+my $f = Logic::Ternary::False;
+my $u = Logic::Ternary::Unknown;
 
 # Negation
 dd $t.not;               # Logic::Ternary::False
-dd NOT($u);              # Logic::Ternary::Unknown
+dd not3 $u;              # Logic::Ternary::Unknown
 
-# Conjunction/Disjunction/XOR (use UPPERCASE)
-dd $t AND $u;            # Logic::Ternary::Unknown
-dd $t OR  $u;            # Logic::Ternary::True
-dd $t XOR $t;            # Logic::Ternary::False
+# Conjunction/Disjunction/xor3 (operands are coerced to Ternary)
+dd $t and3 $u;            # Logic::Ternary::Unknown
+dd $t or3  $u;            # Logic::Ternary::True
+dd $t xor3 $t;            # Logic::Ternary::False
 
 # Coercions
 dd  1 .Ternary;          # Logic::Ternary::True
@@ -155,72 +114,64 @@ dd -3 .Ternary;          # Logic::Ternary::False
 dd  0 .Ternary;          # Logic::Ternary::Unknown
 dd Bool::True.Ternary;   # Logic::Ternary::True
 dd Bool.Ternary;         # Logic::Ternary::Unknown
-
-# Ternary defined-or fallback
-dd $u // $t;             # Logic::Ternary::True
-dd $f // $t;             # Logic::Ternary::False
 =end code
 
 =head1 DESCRIPTION
 
 Logic::Ternary implements a three-valued logic for Raku:
 =item C<True> (+1),
-=item C<Unknown> (0)
+=item C<Unknown> (0),
 =item and C<False> (-1).
 
-The values are
-C<Logic::Ternary::True>, C<Logic::Ternary::Unknown> and
+Values are C<Logic::Ternary::True>, C<Logic::Ternary::Unknown>, and
 C<Logic::Ternary::False>.
 
 =item Predicates: C<.is-true>, C<.is-false>, C<.is-unknown>.
-=item Negation: C<NOT $x> or C<$x.not>.
+=item Negation: C<not3 $x>.
 =item Booleanization: C<Bool($x)> is true only when C<$x> is C<True>.
-=item Coercion: C<Numeric.Ternary> maps negatives→C<False>, zero→C<Unknown>, positives→C<True>; C<Bool.Ternary> preserves C<True/False> and yields C<Unknown> when undefined.
+=begin item
+Coercion: C<Numeric.Ternary> maps:
+=item negatives→C<False>,
+=item zero→C<Unknown>,
+=item positives→C<True>;
+C<Bool.Ternary> preserves C<True/False> and yields C<Unknown> when undefined.
+=end item
 
 =head2 Operators
 
-Always use the UPPERCASE operators:
+These operators always coerce both operands with C<.Ternary>:
 
-=item C<AND>: ternary conjunction with appropriate semantics.
-=item C<OR>: ternary disjunction with appropriate semantics.
-=item C<XOR>: defined as C<(A OR B) AND NOT(A AND B)>.
-=item C<.not> and C<NOT>: negation.
-=item C<//>: ternary "defined-or": returns the right operand when the left is C<Unknown> or a type object (uninstantiated).
-
-=head2 Important: and/&&/or/||/xor/^^
-
-The lowercase operators C<and>, C<&&>, C<or>, C<||>, C<xor> and C<^^>
-are likely not to work correctly with C<Logic::Ternary>. The Raku parser
-gives those operators special short-circuit handling, which can bypass our
-multis and/or force early booleanization.
-
-=item Prefer C<AND>, C<OR> and C<XOR>.
-=item I plan to address this with RakuAST in future versions so the lowercase
-  counterparts can work transparently.
+=item C<and3>: ternary conjunction.
+=item C<or3>: ternary disjunction.
+=item C<xor3>: defined as C<(A or3 B) and3 not3(A and3 B)>.
+=item C<not3>: negation.
+=item C<so3>: ternarisation.
 
 =head2 Quick examples
 
 =begin code :lang<raku>
 use Logic::Ternary;
 
-my $u = Unknown;
+my $u = Logic::Ternary::Unknown;
 
-# AND behavior
-dd $u AND True;   # Logic::Ternary::Unknown
-dd $u AND False;  # Logic::Ternary::False
+# and3 behavior
+dd $u and3 Logic::Ternary::True;   # Logic::Ternary::Unknown
+dd $u and3 Logic::Ternary::False;  # Logic::Ternary::False
 
-# OR behavior
-dd True OR $u;    # Logic::Ternary::True
-dd $u OR False;   # Logic::Ternary::Unknown
+# or3 behavior
+dd Logic::Ternary::True or3 $u;    # Logic::Ternary::True
+dd $u or3 Logic::Ternary::False;   # Logic::Ternary::Unknown
 
-# Smartmatch (~~)
-dd True ~~ True;     # Bool::True
-dd True ~~ Unknown;  # Bool::False
+# Mixed types are coerced
+dd 1 and3 0;       # Logic::Ternary::Unknown
+dd -2 or3  1;      # Logic::Ternary::True
+
+dd not3(1);        # Logic::Ternary::False
 =end code
 
 =head1 AUTHOR
 
-Fernando Corrêa de Oliveira <fco@cpan.org>
+Fernando Corrêa de Oliveira <fernando.correa@payprop.com>
 
 =head1 COPYRIGHT AND LICENSE
 
