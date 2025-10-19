@@ -201,7 +201,9 @@ multis and/or force early booleanization.
 =head2 Quick examples
 
 =begin code :lang<raku>
-my $u = Logic::Ternary::Unknown;
+use Logic::Ternary;
+
+my $u = Unknown;
 
 # AND behavior
 dd $u AND True;   # Logic::Ternary::Unknown
