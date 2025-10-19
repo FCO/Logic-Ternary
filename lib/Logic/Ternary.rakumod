@@ -100,10 +100,10 @@ my $f = False;
 my $u = Unknown;
 
 # Negation
-dd $t.not;               # Logic::Ternary::False
+dd not3 $t;              # Logic::Ternary::False
 dd not3 $u;              # Logic::Ternary::Unknown
 
-# Conjunction/Disjunction/xor3 (operands are coerced to Ternary)
+# Conjunction/Disjunction/xor (operands are coerced to Ternary)
 dd $t and3 $u;            # Logic::Ternary::Unknown
 dd $t or3  $u;            # Logic::Ternary::True
 dd $t xor3 $t;            # Logic::Ternary::False
