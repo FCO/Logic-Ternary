@@ -1,0 +1,25 @@
+{
+  "auth": "zef:FCO",
+  "authors": [
+    "Fernando Corrêa de Oliveira"
+  ],
+  "build-depends": [
+  ],
+  "depends": [
+  ],
+  "description": "Ternary logic for Raku",
+  "license": "Artistic-2.0",
+  "name": "Logic::Ternary",
+  "perl": "6.d",
+  "provides": {
+    "Logic::Ternary": "lib/Logic/Ternary.rakumod"
+  },
+  "resources": [
+  ],
+  "source-url": "",
+  "tags": [
+  ],
+  "test-depends": [
+  ],
+  "version": "0.0.1"
+}

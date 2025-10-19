@@ -1,0 +1,69 @@
+use Test;
+use Logic::Ternary;
+
+my $T = True;
+my $F = False;
+my $U = Unknown;
+
+# Negation
+is-deeply $T.not, $F, 'NOT True -> False (method .not)';
+is-deeply NOT($U), $U, 'NOT Unknown -> Unknown (function)';
+is-deeply NOT($F), $T, 'NOT False -> True (function)';
+
+# Booleanization
+ok $T.Bool, 'Bool(True) is True';
+nok $F.Bool, 'Bool(False) is False';
+nok $U.Bool, 'Bool(Unknown) is False';
+
+# Coercions
+is-deeply  1 .Ternary,  $T, '1.Ternary -> True';
+is-deeply -3 .Ternary,  $F, '-3.Ternary -> False';
+is-deeply  0 .Ternary,  $U, '0.Ternary -> Unknown';
+is-deeply  Bool::True.Ternary,  $T, 'True.Ternary -> True';
+is-deeply  Bool::False.Ternary, $F, 'False.Ternary -> False';
+is-deeply  Bool.Ternary,  $U, 'Bool.Ternary (type object) -> Unknown';
+
+# AND (UPPERCASE)
+is-deeply $T AND $T, $T, 'T AND T -> T';
+is-deeply $T AND $U, $U, 'T AND U -> U';
+is-deeply $T AND $F, $F, 'T AND F -> F';
+is-deeply $U AND $T, $U, 'U AND T -> U';
+is-deeply $U AND $U, $U, 'U AND U -> U';
+is-deeply $U AND $F, $F, 'U AND F -> F';
+is-deeply $F AND $T, $F, 'F AND T -> F';
+is-deeply $F AND $U, $F, 'F AND U -> F';
+is-deeply $F AND $F, $F, 'F AND F -> F';
+
+# OR (UPPERCASE)
+is-deeply $T OR $T, $T, 'T OR T -> T';
+is-deeply $T OR $U, $T, 'T OR U -> T';
+is-deeply $T OR $F, $T, 'T OR F -> T';
+is-deeply $U OR $T, $T, 'U OR T -> U';
+is-deeply $U OR $U, $U, 'U OR U -> U';
+is-deeply $U OR $F, $U, 'U OR F -> U';
+is-deeply $F OR $T, $T, 'F OR T -> T';
+is-deeply $F OR $U, $U, 'F OR U -> U';
+is-deeply $F OR $F, $F, 'F OR F -> F';
+
+# XOR (UPPERCASE)
+is-deeply $T XOR $T, $F, 'T XOR T -> F';
+is-deeply $T XOR $F, $T, 'T XOR F -> T';
+is-deeply $F XOR $F, $F, 'F XOR F -> F';
+is-deeply $U XOR $F, $U, 'U XOR F -> U';
+is-deeply $U XOR $U, $U, 'U XOR U -> U';
+is-deeply $U XOR $T, $U, 'U XOR T -> U';
+
+# Ternary defined-or (//)
+is-deeply $U // $T, $T, 'Unknown // True -> True';
+is-deeply $U // $F, $F, 'Unknown // False -> False';
+is-deeply $T // $F, $T, 'True // False -> True';
+is-deeply $F // $T, $F, 'False // True -> False';
+is-deeply Logic::Ternary // $T, $T, 'Type-object // value -> right operand';
+
+# Smartmatch (~~)
+ok $T ~~ $T, 'True ~~ True';
+nok $T ~~ $U, 'True !~~ Unknown';
+ok $F ~~ $F, 'False ~~ False';
+ok $U ~~ $U, 'Unknown ~~ Unknown';
+
+done-testing;
