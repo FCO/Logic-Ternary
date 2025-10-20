@@ -61,9 +61,9 @@ is-deeply $F // $T, $F, 'False // True -> False';
 is-deeply Logic::Ternary // $T, $T, 'Type-object // value -> right operand';
 
 # Smartmatch (~~)
-ok $T ~~ $T, 'True ~~ True';
+ok  $T ~~ $T, 'True ~~ True';
 nok $T ~~ $U, 'True !~~ Unknown';
-ok $F ~~ $F, 'False ~~ False';
-ok $U ~~ $U, 'Unknown ~~ Unknown';
+ok  $F ~~ $F, 'False ~~ False';
+ok  $U ~~ $U, 'Unknown ~~ Unknown';
 
 done-testing;

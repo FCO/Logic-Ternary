@@ -1,0 +1,31 @@
+use Test;
+use Logic::Ternary;
+
+my @vals = (False, Unknown, True);
+my %name = %(Logic::Ternary::False => 'F', Logic::Ternary::Unknown => 'U', Logic::Ternary::True => 'T');
+
+sub s($x) { %name{$x} // $x.raku }
+
+# Smartmatch truth table: match only when the ternary value is the same
+for @vals -> $a {
+    for @vals -> $b {
+        my $exp = $a === $b; # identity equality of the enum values
+        is-deeply ($a ~~ $b), $exp, "~~ matches identical ternary values: {s $a} ~~ {s $b}";
+        is-deeply ($b ~~ $a), $exp, "~~ is symmetric: {s $b} ~~ {s $a}";
+    }
+}
+
+# Reflexivity
+for @vals -> $a {
+    ok $a ~~ $a, "reflexive: {s $a} ~~ {s $a}";
+}
+
+# Sanity: True does not smartmatch False/Unknown; False does not match True/Unknown; Unknown does not match True/False
+nok True ~~ False,   'True !~~ False';
+nok True ~~ Unknown, 'True !~~ Unknown';
+nok False ~~ True,   'False !~~ True';
+nok False ~~ Unknown,'False !~~ Unknown';
+nok Unknown ~~ True, 'Unknown !~~ True';
+nok Unknown ~~ False,'Unknown !~~ False';
+
+done-testing;

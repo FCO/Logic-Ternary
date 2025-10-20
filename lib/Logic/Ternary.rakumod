@@ -5,18 +5,6 @@ enum Logic::Ternary (
 );
 
 BEGIN {
-	Logic::Ternary.^add_multi_method: "gist",    my multi method gist(Logic::Ternary:D:)    {
-		self > 0
-			?? "True"
-			!! self < 0
-				?? "False"
-				!! "Unknown"
-	}
-
-	Logic::Ternary.^add_multi_method: "raku",    my multi method raku(Logic::Ternary:D:)    {
-		$.gist
-	}
-
 	Logic::Ternary.^add_method: "is-true",    my method is-true    { self >  0 }
 	Logic::Ternary.^add_method: "is-false",   my method is-false   { self <  0 }
 	Logic::Ternary.^add_method: "is-unknown", my method is-unknown { self == 0 }
@@ -24,20 +12,9 @@ BEGIN {
 	Logic::Ternary.^add_multi_method: "ACCEPTS", my method ACCEPTS(
 		Logic::Ternary:D:
 		Logic::Ternary:D $other
-	) {
-		when $.is-true    &&  $other.is-true    { Bool::True  }
-		when $.is-true    && !$other.is-true    { Bool::False }
-		when $.is-false   &&  $other.is-false   { Bool::True  }
-		when $.is-false   && !$other.is-false   { Bool::False }
-		when $.is-unknown &&  $other.is-unknown { Bool::True  }
-		when $.is-unknown && !$other.is-unknown { Bool::False }
-	}
+	) { self == $other }
 
-	Logic::Ternary.^add_method: "not", my method not(--> Logic::Ternary) {
-		when $.is-true    { Logic::Ternary::False   }
-		when $.is-unknown { Logic::Ternary::Unknown }
-		when $.is-false   { Logic::Ternary::True    }
-	}
+	Logic::Ternary.^add_method: "not", my method not(--> Logic::Ternary) { (-1 * self).Ternary }
 
 	Logic::Ternary.^add_method: "so", my method so { self }
 
