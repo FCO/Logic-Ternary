@@ -1,6 +1,8 @@
 Revision history for Logic::Ternary
 
 {{$NEXT}}
+
+0.0.3  2025-10-21T23:15:41+01:00
     - fix coersion
     - make exports customisable
 
