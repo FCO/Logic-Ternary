@@ -1,0 +1,48 @@
+use Test;
+use Logic::Ternary;
+
+# Functions to exercise coercive types on parameters and returns
+sub id-param(Logic::Ternary() $x)                     { $x }
+sub id-ret($x --> Logic::Ternary())                   { $x }
+sub id-both(Logic::Ternary() $x --> Logic::Ternary()) { $x }
+
+# Table: (input, expected-ternary)
+my @cases = (
+    1          , True,
+    -2         , False,
+    0          , Unknown,
+    3.5        , True,
+    -0.25      , False,
+    0e0        , Unknown,
+    Bool::True , True,
+    Bool::False, False,
+    Bool       , Unknown,   # type object
+    'hi'       , True,      # truthy Str
+    ''         , False,     # falsy Str
+);
+
+for @cases -> $in, $exp {
+    is-deeply id-param($in), $exp, "param coercion: {$in.raku} -> {$exp}";
+    is-deeply id-ret($in),   $exp, "return coercion: {$in.raku} -> {$exp}";
+    is-deeply id-both($in),  $exp, "param+return coercion: {$in.raku} -> {$exp}";
+}
+
+# Also test coercive-typed operators accept non-ternary arguments
+is-deeply (so3 1), True,     'so3 coerces 1 -> True';
+is-deeply (so3 0), Unknown,  'so3 coerces 0 -> Unknown';
+is-deeply (so3 -1), False,   'so3 coerces -1 -> False';
+
+is-deeply (1 and3 0), Unknown, 'and3 coerces Ints';
+is-deeply ('x' or3 -5), True,  'or3 coerces Str and Int';
+is-deeply ('' and3 -5), False,  'and3 with falsy Str and Int -> False';
+
+# .Ternary method is a coercive-return shim; ensure it behaves as expected
+is-deeply  1 .Ternary,  True,    '.Ternary: 1 -> True';
+is-deeply -3 .Ternary,  False,   '.Ternary: -3 -> False';
+is-deeply  0 .Ternary,  Unknown, '.Ternary: 0 -> Unknown';
+is-deeply  Bool::True.Ternary,  True,  '.Ternary: True -> True';
+is-deeply  Bool::False.Ternary, False, '.Ternary: False -> False';
+is-deeply  Bool.Ternary,  Unknown,     '.Ternary: Bool type object -> Unknown';
+
+
+done-testing;

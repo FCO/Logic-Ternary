@@ -1,64 +1,122 @@
-enum Logic::Ternary (
-	False   => -1,
-	Unknown =>  0,
-	True    => +1,
-);
-
-BEGIN {
-	Logic::Ternary.^add_method: "is-true",    my method is-true    { self >  0 }
-	Logic::Ternary.^add_method: "is-false",   my method is-false   { self <  0 }
-	Logic::Ternary.^add_method: "is-unknown", my method is-unknown { self == 0 }
-
-	Logic::Ternary.^add_multi_method: "ACCEPTS", my method ACCEPTS(
-		Logic::Ternary:D:
-		Logic::Ternary:D $other
-	) { self == $other }
-
-	Logic::Ternary.^add_method: "not", my method not(--> Logic::Ternary) { (-1 * self).Ternary }
-
-	Logic::Ternary.^add_method: "so", my method so { self }
-
-	Logic::Ternary.^add_method: "Bool", my method Bool { $.is-true }
-}
-
-multi prefix:<so3>($value) is export { $value.Ternary.so }
-
-multi prefix:<not3>($value) is export { $value.Ternary.not }
-
-multi infix:<and3>($a, $b) is export { $a.Ternary min $b.Ternary }
-
-multi infix:<or3>($a, $b) is export { $a.Ternary max $b.Ternary }
-
-multi infix:<xor3>($a is copy, $b is copy) is export {
-	$a .= Ternary;
-	$b .= Ternary;
-	($a or3 $b) and3 not3 ($a and3 $b)
-}
-
-
-use MONKEY-TYPING;
-augment class Any {
-	proto method Ternary(--> Logic::Ternary) { * }
-	multi method Ternary(::?CLASS:U:) { Logic::Ternary::Unknown }
-	multi method Ternary(::?CLASS:D:) { Logic::Ternary::Unknown }
-	multi method Ternary(Numeric:D:)  {
-		return Logic::Ternary::Unknown if self == 0;
-		given self / self.abs {
-			when * < 0 { Logic::Ternary::False }
-			when * > 0 { Logic::Ternary::True  }
-			default { die "Error converting {self} to ternary" }
+sub EXPORT(*@options --> Map()) {
+	my Bool $export = True;
+	if @options == 1 {
+		if @options[0] eq "none" {
+			$export  = False;
+			@options = ();
+		} elsif @options[0] eq "True" {
+			@options = <True Unknown False>;
+		} elsif @options[0] eq "True3" {
+			@options = <True3 Unknown3 False3>;
+		} elsif @options[0] eq "KnownTrue" {
+			@options = <KnownTrue Unknown KnownFalse>;
 		}
 	}
-}
-augment class Int {
-	multi method defined(Logic::Ternary::Unknown:) { self }
-}
+	@options = <True Unknown False> unless @options;
+	class Logic::Ternary { ... }
 
-augment class Bool {
-	method Ternary {
-		return Logic::Ternary::Unknown without self;
-		self ?? Logic::Ternary::True !! Logic::Ternary::False
+	multi infix:<cmp>(Logic::Ternary $a, Logic::Ternary $b) is export { $a.Int cmp $b.Int }
+	multi infix:<min>(Logic::Ternary $a, Logic::Ternary $b) is export { Logic::Ternary($a.Int min $b.Int) }
+	multi infix:<max>(Logic::Ternary $a, Logic::Ternary $b) is export { Logic::Ternary($a.Int max $b.Int) }
+
+	multi prefix:<so3>(Logic::Ternary() $value) is export { $value }
+
+	multi prefix:<not3>(Logic::Ternary() $value) is export { $value.not }
+
+	multi infix:<and3>(Logic::Ternary() $a, Logic::Ternary() $b) is export { $a min $b }
+
+	multi infix:<or3>(Logic::Ternary() $a, Logic::Ternary() $b) is export { $a max $b }
+
+	multi infix:<xor3>(Logic::Ternary() $a, Logic::Ternary() $b) is export {
+		($a or3 $b) and3 not3 ($a and3 $b)
 	}
+
+	class Logic::Ternary does Enumeration {
+		my %enumerations =
+			@options[0] => +1,
+			@options[1] =>  0,
+			@options[2] => -1,
+		;
+		my %anti = %enumerations.antipairs;
+
+		method new(Str:D $val where @options.one) {
+			self.bless: key => $val, value => %enumerations{$val}
+		}
+
+		multi method CALL-ME($value) {
+			my $key = do given $value {
+				when $_ =:= True    {              +1 }
+				when $_ =:= False   {              -1 }
+				when !*.defined     {               0 }
+				when $_ !~~ Numeric {  .so ?? 1 !! -1 }
+				when 0              {               0 }
+				when 0.0            {               0 }
+				when 0e0            {               0 }
+				when Numeric        { ($_ / .abs).Int }
+				default             {  .so ?? 1 !! -1 }
+			}
+			::?CLASS.new: %anti{$key}
+		}
+
+		method ^enum_from_value($, $value) { ::?CLASS.CALL-ME: $value }
+
+		method is-true    { self >  0 }
+		method is-false   { self <  0 }
+		method is-unknown { self == 0 }
+
+		multi method ACCEPTS( ::?CLASS:D: ::?CLASS:D $other ) { self == $other }
+
+		method not(--> ::?CLASS) { Logic::Ternary((-1 * self).Int) }
+
+		method so { self }
+
+		method Bool {
+			return Bool without self;
+			$.is-true
+		}
+
+		multi method Int(::?CLASS:D:) { $.value }
+
+		proto method COERCE($)                    {                    * }
+		multi method COERCE(Bool:D $ where *.so ) {            self.(+1) }
+		multi method COERCE(Bool:D $ where *.not) {            self.(-1) }
+		multi method COERCE(Bool:U)               {            self.( 0) }
+		multi method COERCE(Numeric $a)           {            self.($a) }
+		multi method COERCE(Any $a)               { self.COERCE($a.Bool) }
+
+		method defined {
+			return Bool::False unless self.DEFINITE;
+			self !~~ Logic::Ternary::<Unknown>
+		}
+	}
+
+	use MONKEY-TYPING;
+	augment class Any {
+		method Ternary(--> Logic::Ternary()) { self }
+	}
+
+	Logic::Ternary::{@options[0]} = Logic::Ternary.new: @options[0];
+	Logic::Ternary::{@options[1]} = Logic::Ternary.new: @options[1];
+	Logic::Ternary::{@options[2]} = Logic::Ternary.new: @options[2];
+
+	|(
+		|(
+			@options[0] => Logic::Ternary::{@options[0]},
+			@options[1] => Logic::Ternary::{@options[1]},
+			@options[2] => Logic::Ternary::{@options[2]},
+		) if $export;
+	),
+
+	'&infix:<cmp>'   => &infix:<cmp>  ,
+	'&infix:<min>'   => &infix:<min>  ,
+	'&infix:<max>'   => &infix:<max>  ,
+
+	'&infix:<and3>'  => &infix:<and3> ,
+	'&infix:<or3>'   => &infix:<or3>  ,
+	'&infix:<xor3>'  => &infix:<xor3> ,
+
+	'&prefix:<so3>'  => &prefix:<so3> ,
+	'&prefix:<not3>' => &prefix:<not3>,
 }
 
 =begin pod

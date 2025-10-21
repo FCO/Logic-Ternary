@@ -1,0 +1,58 @@
+use Test;
+
+# Default export should provide True/Unknown/False
+is EVAL(q:to/CODE/), '1,0,-1', 'default exports True/Unknown/False';
+use Logic::Ternary;
+(True.Int, Unknown.Int, False.Int).join(",")
+CODE
+
+# Single option "True" explicitly selects the default names
+is EVAL(q:to/CODE/), '1,0,-1', 'single "True" selects default names';
+use Logic::Ternary <True>;
+(True.Int, Unknown.Int, False.Int).join(",")
+CODE
+
+# Variant: True3 / Unknown3 / False3
+is EVAL(q:to/CODE/), '1,0,-1', 'exports True3/Unknown3/False3';
+use Logic::Ternary <True3>;
+(True3.Int, Unknown3.Int, False3.Int).join(",")
+CODE
+
+# Variant: KnownTrue / Unknown / KnownFalse
+is EVAL(q:to/CODE/), '1,0,-1', 'exports KnownTrue/Unknown/KnownFalse';
+use Logic::Ternary <KnownTrue>;
+(KnownTrue.Int, Unknown.Int, KnownFalse.Int).join(",")
+CODE
+
+# Custom names list: Yes / Maybe / No
+is EVAL(q:to/CODE/), '1,0,-1', 'exports custom names list Yes/Maybe/No';
+use Logic::Ternary <Yes Maybe No>;
+(Yes.Int, Maybe.Int, No.Int).join(",")
+CODE
+
+# Option: none -> do not export the values to lexical scope
+# True remains the core Bool::True and not a Logic::Ternary value
+is EVAL(q:to/CODE/), 'Bool::True', 'no ternary constants exported with <none>';
+use Logic::Ternary <none>;
+True.raku
+CODE
+
+# But fully qualified names still exist in Logic::Ternary::
+is EVAL(q:to/CODE/), 'Logic::Ternary::True', 'qualified Logic::Ternary::<True> exists with <none>';
+use Logic::Ternary <none>;
+Logic::Ternary::True.raku
+CODE
+
+# And operators are still exported even under <none>
+is EVAL(q:to/CODE/), -1, 'operators exported with <none> (not3 available)';
+use Logic::Ternary <none>;
+(not3 1).Int
+CODE
+
+# Sanity: each eval is isolated; nothing leaked to the outer scope
+ok so EVAL(q:to/CODE/), 'eval scopes isolated';
+use Logic::Ternary <True3>;
+(True3 ~~ Logic::Ternary::True3) && (True.raku eq 'Bool::True')
+CODE
+
+done-testing;
