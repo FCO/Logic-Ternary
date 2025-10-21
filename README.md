@@ -97,6 +97,54 @@ dd -2 or3  1;      # Logic::Ternary::True
 dd not3 1;         # Logic::Ternary::False
 ```
 
+Exports
+-------
+
+By default, `use Logic::Ternary;` exports the enum names
+
+  * `True`,
+
+  * `Unknown`,
+
+  * `False`
+
+and the operators:
+
+  * `not3`,
+
+  * `and3`,
+
+  * `or3`,
+
+  * `xor3`,
+
+  * `so3`.
+
+You can customize which enum names are exported by passing options to the `use` line:
+
+  * Single shorthands:
+
+      * `<True> ` — same as `<True Unknown False> `.
+
+      * `<True3> ` — exports `<True3 Unknown3 False3> `.
+
+      * `<KnownTrue> ` — exports `<KnownTrue Unknown KnownFalse> `.
+
+  * Custom list: Provide three identifiers: `<Yes Maybe No> `.
+
+  * None: `<none> ` disables exporting the enum names to the lexical scope; operators are still exported. Fully qualified enum values are always available under `Logic::Ternary::`.
+
+```raku
+use Logic::Ternary;                 # True/Unknown/False
+use Logic::Ternary <True>;          # same as default
+use Logic::Ternary <True3>;         # True3/Unknown3/False3
+use Logic::Ternary <KnownTrue>;     # KnownTrue/Unknown/KnownFalse
+use Logic::Ternary <Yes Maybe No>;  # custom names
+use Logic::Ternary <none>;          # no constants; operators only
+say (not3 1).Int;                   # -1
+say Logic::Ternary::True.raku;      # 'Logic::Ternary::True'
+```
+
 AUTHOR
 ======
 

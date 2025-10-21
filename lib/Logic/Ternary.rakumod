@@ -204,6 +204,49 @@ dd -2 or3  1;      # Logic::Ternary::True
 dd not3 1;         # Logic::Ternary::False
 =end code
 
+=head2 Exports
+
+By default, C<use Logic::Ternary;> exports the enum names
+
+=item C<True>,
+=item C<Unknown>,
+=item C<False>
+
+and the operators:
+
+=item C<not3>,
+=item C<and3>,
+=item C<or3>,
+=item C<xor3>,
+=item C<so3>.
+
+You can customize which enum names are exported by passing options to the C<use> line:
+
+=begin item
+Single shorthands:
+
+=item C<< <True> >> — same as C<< <True Unknown False> >>.
+=item C<< <True3> >> — exports C<< <True3 Unknown3 False3> >>.
+=item C<< <KnownTrue> >> — exports C<< <KnownTrue Unknown KnownFalse> >>.
+=end item
+
+=item Custom list:
+Provide three identifiers: C<< <Yes Maybe No> >>.
+
+=item None:
+C<< <none> >> disables exporting the enum names to the lexical scope; operators are still exported. Fully qualified enum values are always available under C<Logic::Ternary::>.
+
+=begin code :lang<raku>
+use Logic::Ternary;                 # True/Unknown/False
+use Logic::Ternary <True>;          # same as default
+use Logic::Ternary <True3>;         # True3/Unknown3/False3
+use Logic::Ternary <KnownTrue>;     # KnownTrue/Unknown/KnownFalse
+use Logic::Ternary <Yes Maybe No>;  # custom names
+use Logic::Ternary <none>;          # no constants; operators only
+say (not3 1).Int;                   # -1
+say Logic::Ternary::True.raku;      # 'Logic::Ternary::True'
+=end code
+
 =head1 AUTHOR
 
 Fernando Corrêa de Oliveira <fco@cpan.org>
